@@ -15,12 +15,8 @@
 #include "utils.h"
 #include "match.h"
 #include "predecessor.h"
-extern "C" {
-   #include "gsa-is/gsacak.h"
-}
-extern "C" {
-   #include "sais-lite-2.4.1/sais.h"
-}
+#include "gsa-is/gsacak.h"
+#include "sais-lite-2.4.1/sais.h"
 
 #undef max
 //#include "inplace-radixxx/inplace_radixxx.h"

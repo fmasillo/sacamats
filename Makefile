@@ -17,4 +17,4 @@ matchstat: $(OBJS)
 	$(CC) $(CFLAGS) -o matchstat $(OBJS) $(LIBS)
 
 clean:
-	/bin/rm -f matchstat *.o
+	/bin/rm -f matchstat *.o gsa-is/*.o sais-lite-2.4.1/*.o
