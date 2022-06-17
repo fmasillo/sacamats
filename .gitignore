@@ -1,0 +1,48 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+gsa-is/*.o
+sais-lite-2.4.1/*.o
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Executable for matching statistics
+matchstat
+
+# VSCode folder
+.vscode
+
+# File of names
+*file_names.txt
+test_file_names.txt
+
+# Makefile
+Makefile
+matching_statistics/Makefile
