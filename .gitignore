@@ -34,7 +34,7 @@ sais-lite-2.4.1/*.o
 *.app
 
 # Executable for matching statistics
-matchstat
+sacamats
 
 # VSCode folder
 .vscode

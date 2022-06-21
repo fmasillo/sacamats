@@ -9,6 +9,7 @@
 #include <vector>
 #include <string.h>
 #include <cstdlib>
+#include <fstream>
 
 #include "sacamats.h"
 #include "rmq_tree.h"
@@ -68,6 +69,8 @@ uint64_t diffSufHeads;
 
 uint16_t sizeChars = 256;
 uint64_t D = 0;
+
+std::vector<std::pair<uint32_t, int32_t>> MSGSA;
 
 //std::vector<std::pair<uint32_t,uint32_t> > phrases;
 std::vector<Match> phrases;
@@ -245,11 +248,66 @@ uint64_t checkGSA(std::vector<SufSStar> GSA, uint64_t n){
     return err;
 }
 
-void lzInitialize(data_type *ax, unsigned int an, bool isMismatchingSymbolNeeded, char *refFileName, char *collFileName) {
+void lzInitialize(char *refFileName, char *collFileName) {
+//void lzInitialize(data_type *ax, unsigned int an, bool isMismatchingSymbolNeeded, char *refFileName, char *collFileName) {
    auto t1 = std::chrono::high_resolution_clock::now();
+   errno = 0;
+   FILE *infileRef = fopen(refFileName, "r");
+   //FILE *infile = fopen("~/Desktop/Simon/data/themisto_data/genomes64.concat.da.dict.16K.1K", "r");
+   if (!infileRef) {
+      fprintf(stderr, "Error opening file of base sequence %s, errno=%d\n", refFileName,errno);
+      exit(1);
+   }
+   fprintf(stderr, "About to read ref\n");
+
+   unsigned int n = 0;
+   //data_type *x = new data_type[n + 1];
+   fseek(infileRef, 0, SEEK_END);
+   n = ftell(infileRef) / sizeof(data_type);
+   std::cerr << "n = " << n << '\n';
+   fseek(infileRef, 0, SEEK_SET);
+   _x.resize(n);
+   if(n){
+      char *firstChar = new char[1];
+      int o = fread(firstChar, sizeof(char), 1, infileRef);
+      std::cerr << "firstChar: " << firstChar << '\n';
+      if(firstChar[0] == '>'){
+         std::cerr << "Yes FASTA\n";
+         std::ifstream streamInfileRef(refFileName);
+         std::string line, content;
+         while(std::getline(streamInfileRef, line).good()){
+            if( line.empty() || line[0] == '>' ){
+               _x += content;
+               std::string().swap(content);
+            }
+            else if (!line.empty()) {
+               content += line;
+            }
+         }
+         _x += content;
+         std::string().swap(content);
+         _x.resize(_x.size());
+         streamInfileRef.close();
+      }
+      else{
+         std::cerr << "No FASTA\n";
+         fseek(infileRef, 0, SEEK_SET);
+         if (n != fread(&_x[0], sizeof(data_type), n, infileRef)) {
+            fprintf(stderr, "Error reading %u bytes from file %s\n", n, refFileName);
+            exit(1);
+         }
+      }
+      //x[n] = 0;
+   }
+   else{
+      std::cerr << "Reference file is empty!\n";
+      exit(1);
+   }
+   fclose(infileRef);
+   fprintf(stderr, "Reference (size = %u):\n\t", _x.size());
 
    auto t01 = std::chrono::high_resolution_clock::now();
-   _x = std::string(reinterpret_cast<char const *>(ax), an);
+   //_x = std::string(reinterpret_cast<char const *>(x), n);
    if((_x[_x.size()-1] == '\n') | (_x[_x.size()-1] == '\r')){
       _x.erase(_x.size()-1);
    }
@@ -361,7 +419,7 @@ void lzInitialize(data_type *ax, unsigned int an, bool isMismatchingSymbolNeeded
    t02 = std::chrono::high_resolution_clock::now();
    std::cerr << "Computing RMQ done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t02 - t01).count() << " ms\n";
 
-   _isMismatchingSymbolNeeded = isMismatchingSymbolNeeded;
+   //_isMismatchingSymbolNeeded = isMismatchingSymbolNeeded;
    std::cerr << "Finished pre-processing\n";
 
    auto t2 = std::chrono::high_resolution_clock::now();
@@ -372,8 +430,9 @@ void lzInitialize(data_type *ax, unsigned int an, bool isMismatchingSymbolNeeded
 
 }
 
-int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v) {
-   verbose = v;
+int lzFactorize() {
+//int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v) {
+   verbose = 0;
    //omp_set_num_threads(4);
    std::cerr << "File is in memory\n";
    auto t1 = std::chrono::high_resolution_clock::now();
@@ -900,7 +959,6 @@ int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v
    // for(size_t i = 0; i < headsSA.size(); i++){
    //    phrases[i].changeP(headsSA[phrases[i].pos].pos);
    // }
-   std::vector<std::pair<uint32_t, int32_t>> MSGSA;
    MSGSA.reserve(_sn);
    uint64_t diffLen;
    std::reverse(sStar.begin(), sStar.end());
@@ -1013,6 +1071,12 @@ int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v
    // std::vector<Suf>().swap(MSGSA);
 
     return numfactors;
+}
+
+std::vector<std::pair<uint32_t, int32_t>> computeGSA(char* refFileName, char* collFileName){
+   lzInitialize(refFileName, collFileName);
+   lzFactorize();
+   return MSGSA;
 }
 
 void computeLZFactorAt(filelength_type i, filelength_type *pos, filelength_type *len, int64_t & leftB, int64_t & rightB, int64_t & maxMatch, bool & isSmallerThanMaxMatch, unsigned char &mismatchingSymbol) {

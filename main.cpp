@@ -11,8 +11,9 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    if (argc > 5) {
-        fprintf(stderr, "usage: %s {file of filenames} {isMismatchingSymbolNeeded (1 - yes, 0 - no)} {output file} {verbose}\n", argv[0]);
+    if (argc > 2) {
+        //fprintf(stderr, "usage: %s {file of filenames} {isMismatchingSymbolNeeded (1 - yes, 0 - no)} {output file} {verbose}\n", argv[0]);
+        fprintf(stderr, "usage: %s {file of filenames}\n", argv[0]);
         exit(1);
     }
 
@@ -20,9 +21,9 @@ int main(int argc, char **argv) {
 //    double ttotal = getTime();
 
 //    char output_opt = argv[3][0];
-    std::cerr << argv[4] << "\n";
-    bool verbose = argv[4][0] == '1';
-    std::cerr << "verbose = " << verbose << "\n";
+    //std::cerr << argv[4] << "\n";
+    //bool verbose = argv[4][0] == '1';
+    //std::cerr << "verbose = " << verbose << "\n";
     FILE *infilesfile = fopen(argv[1], "r");
     if (!infilesfile) {
         fprintf(stderr, "Error opening file of filenames %s\n", argv[1]);
@@ -38,30 +39,6 @@ int main(int argc, char **argv) {
     filename[strlen(filename) - 1] = 0;
     char *refFileName = new char[1024];
     strcpy(refFileName, filename);
-
-    std::cerr << filename << '\n';
-
-    errno = 0;
-    FILE *infile = fopen(filename, "r");
-    //FILE *infile = fopen("~/Desktop/Simon/data/themisto_data/genomes64.concat.da.dict.16K.1K", "r");
-    if (!infile) {
-        fprintf(stderr, "Error opening file of base sequence %s, errno=%d\n", filename,errno);
-        exit(1);
-    }
-    fprintf(stderr, "About to read ref\n");
-
-    unsigned int n = 0;
-    fseek(infile, 0, SEEK_END);
-    n = ftell(infile) / sizeof(data_type);
-    std::cerr << "n = " << n << '\n';
-    fseek(infile, 0, SEEK_SET);
-    data_type *x = new data_type[n + 1];
-    if (n != fread(x, sizeof(data_type), n, infile)) {
-        fprintf(stderr, "Error reading %u bytes from file %s\n", n, filename);
-        exit(1);
-    }
-    x[n] = 0;
-    fclose(infile);
 
     //fprintf(stderr, "About to read SA of ref\n");
     //read the suffix array
@@ -106,7 +83,7 @@ int main(int argc, char **argv) {
     //}
     //std::cerr << "Avg. LCP: " << lcpsum/n << "\n";
 
-    fprintf(stderr, "Reference (size = %u):\n\t", n);
+    //fprintf(stderr, "Reference (size = %u):\n\t", n);
     //for (int bi = 0; bi < n; bi++) {
     //    fprintf(stderr, "%u, ", x[bi]);
     //}
@@ -115,8 +92,14 @@ int main(int argc, char **argv) {
     //compute relative LZ factorization
     char * _ = fgets(filename, 1024, infilesfile);
     filename[strlen(filename) - 1] = '\0';
-    lzInitialize(x, n, std::stoul(argv[2]), refFileName, filename);
-    lzFactorize(filename, 0, argv[3], verbose);
+    
+    //lzInitialize(x, n, std::stoul(argv[2]), refFileName, filename);
+    //lzFactorize(filename, 0, argv[3], verbose);
+
+    computeGSA(refFileName, filename);
+    //lzInitialize(x, n, refFileName, filename);
+    //lzFactorize(filename, 0);
+
 //     int seqno = 1;
 //     unsigned int totalNumFactors = 0;
 // //    double totalBitsOut = 0;
@@ -147,7 +130,7 @@ int main(int argc, char **argv) {
     exit(0);
 
     free(filename);
-    delete[] x;
+    //delete[] x;
     //delete[] sa;
     return 0;
 }
