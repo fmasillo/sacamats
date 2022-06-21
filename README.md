@@ -5,6 +5,7 @@ Algorithm for constructing the generalized suffix array of a collection of highl
 
 ```sh
 git clone https://github.com/fmasillo/sacamats.git
+git submodule update --init --recursive
 cd sacamats
 make
 ```
