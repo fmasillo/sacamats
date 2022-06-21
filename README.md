@@ -1,7 +1,8 @@
 # sacamats
-Suffix sorting algorithm for set of similar strings
+Algorithm for constructing the generalized suffix array of a collection of highly similar strings.
 
 ## Installation
+
 ```sh
 git clone https://github.com/fmasillo/sacamats.git
 cd sacamats
@@ -19,8 +20,8 @@ Command example:
 
 List of files example:
 ```
-/home/Desktop/reference.fa
-/home/Desktop/collection.fa
+/data/reference.fa
+/data/collection.fa
 ```
 
 ## Citation
