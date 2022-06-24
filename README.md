@@ -29,7 +29,18 @@ List of files example:
 
 Please, if you use this tool in an academic setting cite the following paper (to appear in WABI2022):
 
-Zsuzsanna Lipták, Francesco Masillo, Simon J. Puglisi. Suffix sorting via matching statistics. In Proc. Workshop in Algorithm for Bioinformatics (WABI), 2022
+@inproceedings{LiptakMP2022,
+  author    = {Zsuzsanna Lipták and Francesco Masillo and Simon J. Puglisi},
+  editor    = {},
+  title     = {Suffix sorting via matching statistics},
+  booktitle = {22st International Workshop on Algorithms in Bioinformatics, {WABI}
+               2022, September 5-7, 2022, Potsdam, Germany},
+  series    = {LIPIcs},
+  volume    = {242},
+  pages     = {},
+  publisher = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
+  year      = {2022},
+}
 
 
 
