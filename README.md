@@ -33,13 +33,8 @@ Please, if you use this tool in an academic setting cite the following paper (to
   @inproceedings{LiptakMP2022,
     author    = {Zsuzsanna Lipták and Francesco Masillo and Simon J. Puglisi},
     title     = {Suffix sorting via matching statistics},
-    editor    = {},
     booktitle = {22nd International Workshop on Algorithms in Bioinformatics, {WABI}
                  2022, September 5-7, 2022, Potsdam, Germany},
-    series    = {LIPIcs},
-    volume    = {242},
-    pages     = {xx--xx},
-    publisher = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
     year      = {2022},
   }
 ```
