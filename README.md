@@ -29,7 +29,7 @@ List of files example:
 
 Please, if you use this tool in an academic setting cite the following paper (to appear in WABI2022):
 
-  @inproceedings{LiptakMP2022,
+  @article{LiptakMP2022,
     author    = {Zsuzsanna Lipták and Francesco Masillo and Simon J. Puglisi},
     title     = {Suffix sorting via matching statistics},
     booktitle = {22st International Workshop on Algorithms in Bioinformatics, {WABI}
