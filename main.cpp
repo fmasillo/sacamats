@@ -95,8 +95,8 @@ int main(int argc, char **argv) {
     
     //lzInitialize(x, n, std::stoul(argv[2]), refFileName, filename);
     //lzFactorize(filename, 0, argv[3], verbose);
-
-    computeGSA(refFileName, filename);
+    std::vector<std::pair<uint32_t, int32_t>> MSGSA;
+    computeGSA(refFileName, filename, MSGSA);
     //lzInitialize(x, n, refFileName, filename);
     //lzFactorize(filename, 0);
 

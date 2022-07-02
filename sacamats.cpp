@@ -24,7 +24,7 @@
 
 //#define likely(x)       __builtin_expect((x),1)
 
-void computeLZFactorAt(filelength_type i, filelength_type *pos, filelength_type *len, int64_t &leftB, int64_t &rightB, int64_t &match, bool &isSmaller, unsigned char &mismatchingSymbol);
+void computeLZFactorAt(const std::string &_sx, filelength_type i, filelength_type *pos, filelength_type *len, int64_t &leftB, int64_t &rightB, int64_t &match, bool &isSmaller, unsigned char &mismatchingSymbol);
 inline int64_t binarySearchLB(int64_t lo, int64_t hi, filelength_type offset, data_type c);
 inline int64_t binarySearchRB(int64_t lo, int64_t hi, filelength_type offset, data_type c);
 
@@ -38,7 +38,7 @@ static uint32_t *_LCP;
 static uint32_t *_PLCP;
 static rmq_tree *_rmq;
 static uint32_t _n;
-static data_type *_sx;
+//static data_type *_sx;
 static filelength_type _sn;
 static bool _isMismatchingSymbolNeeded;
 static std::vector<uint32_t> docBoundaries;
@@ -70,7 +70,7 @@ uint64_t diffSufHeads;
 uint16_t sizeChars = 256;
 uint64_t D = 0;
 
-std::vector<std::pair<uint32_t, int32_t>> MSGSA;
+//std::vector<std::pair<uint32_t, int32_t>> MSGSA;
 
 //std::vector<std::pair<uint32_t,uint32_t> > phrases;
 std::vector<Match> phrases;
@@ -184,7 +184,7 @@ bool compareSuf(const SufSStar &a, const SufSStar &b){
    }
 }
 
-uint64_t checkHeadsSA(std::vector<MatchSA> &GSA, uint64_t n){
+uint64_t checkHeadsSA(std::vector<MatchSA> &GSA, uint64_t n, std::string &_sx){
    uint64_t err = 0;
    for(size_t i = 0; i < n; i++){
        if(verbose) std::cerr << "i=" << i << ": " << phrases[GSA[i].start].start << " " << GSA[i].len << " " << "\n";//MSGSA[i].head <<"\n";
@@ -192,21 +192,21 @@ uint64_t checkHeadsSA(std::vector<MatchSA> &GSA, uint64_t n){
       //     std::cerr << "There was an empty entry\n";
       //     continue;
       //  }
-       data_type *_slice_sx = _sx + phrases[GSA[i].start].start + docBoundaries[GSA[i].len - 1];
-       data_type *_slice_prev;
+       const std::string _slice_sx = _sx.substr(phrases[GSA[i].start].start + docBoundaries[GSA[i].len - 1]);
+       std::string _slice_prev;
        uint32_t maxIdx;
        if(i > 0){
-         _slice_prev = _sx + phrases[GSA[i-1].start].start + docBoundaries[GSA[i-1].len - 1];
+         _slice_prev = _sx.substr(phrases[GSA[i-1].start].start + docBoundaries[GSA[i-1].len - 1]);
          maxIdx = std::min(docBoundaries[GSA[i].len] - (phrases[GSA[i].start].start + docBoundaries[GSA[i].len - 1]), docBoundaries[GSA[i-1].len] - (phrases[GSA[i-1].start].start + docBoundaries[GSA[i-1].len - 1]));
        } 
        else{
-          _slice_prev = (data_type *)"$";
+          _slice_prev = "$";
           maxIdx = 1;
        }
        if(verbose) std::cerr << "suf_i-1 " << _slice_prev;
        if(verbose) std::cerr << "suf_i " << _slice_sx << "\n";
        
-      if(memcmp(_slice_sx, _slice_prev, maxIdx) < 0){
+      if(memcmp(&_slice_sx[0], &_slice_prev[0], maxIdx) < 0){
          if(verbose) std::cerr << "PROBLEM with " << i-1 << " (" << phrases[GSA[i-1].start].start << "," << GSA[i-1].len << ") and " << i << " (" << phrases[GSA[i].start].start << "," << GSA[i].len << ")\n"; 
          err++;
       }
@@ -214,7 +214,7 @@ uint64_t checkHeadsSA(std::vector<MatchSA> &GSA, uint64_t n){
     return err;
 }
 
-uint64_t checkGSA(std::vector<SufSStar> GSA, uint64_t n){
+uint64_t checkGSA(std::vector<SufSStar> GSA, uint64_t n, const std::string &_sx){
    uint64_t err = -1;
    #pragma omp parallel for
    for(size_t i = 0; i < n; i++){
@@ -225,21 +225,21 @@ uint64_t checkGSA(std::vector<SufSStar> GSA, uint64_t n){
           err++;
           continue;
        }
-       data_type *_slice_sx = _sx + GSA[i].idx + docBoundaries[GSA[i].doc - 1];
-       data_type *_slice_prev;
+       const std::string _slice_sx = _sx.substr(GSA[i].idx + docBoundaries[GSA[i].doc - 1]);
+       std::string _slice_prev;
        uint32_t maxIdx;
        if(i > 0){
-         _slice_prev = _sx + GSA[i-1].idx + docBoundaries[GSA[i-1].doc - 1];
+         _slice_prev = _sx.substr(GSA[i-1].idx + docBoundaries[GSA[i-1].doc - 1]);
          maxIdx = std::min(docBoundaries[GSA[i].doc] - (GSA[i].idx + docBoundaries[GSA[i].doc - 1]), docBoundaries[GSA[i-1].doc] - (GSA[i-1].idx + docBoundaries[GSA[i-1].doc - 1]));
        } 
        else{
-          _slice_prev = (data_type *)"$";
+          _slice_prev = "$";
           maxIdx = 1;
        }
        if(verbose) std::cerr << "suf_i-1 " << _slice_prev;
        if(verbose) std::cerr << "suf_i " << _slice_sx << "\n";
        
-      if(memcmp(_slice_sx, _slice_prev, maxIdx) < 0){
+      if(memcmp(&_slice_sx[0], &_slice_prev[0], maxIdx) < 0){
          std::cerr << "PROBLEM with " << i-1 << " (" << GSA[i-1].idx << "," << GSA[i-1].doc << ") and " << i << " (" << GSA[i].idx << "," << GSA[i].doc << ")\n"; 
          #pragma omp atomic
          err++;
@@ -248,7 +248,7 @@ uint64_t checkGSA(std::vector<SufSStar> GSA, uint64_t n){
     return err;
 }
 
-void lzInitialize(char *refFileName, char *collFileName) {
+const std::string lzInitialize(char *refFileName, char *collFileName) {
 //void lzInitialize(data_type *ax, unsigned int an, bool isMismatchingSymbolNeeded, char *refFileName, char *collFileName) {
    auto t1 = std::chrono::high_resolution_clock::now();
    errno = 0;
@@ -266,32 +266,35 @@ void lzInitialize(char *refFileName, char *collFileName) {
    n = ftell(infileRef) / sizeof(data_type);
    std::cerr << "n = " << n << '\n';
    fseek(infileRef, 0, SEEK_SET);
-   _x.resize(n);
    if(n){
       char *firstChar = new char[1];
       int o = fread(firstChar, sizeof(char), 1, infileRef);
-      std::cerr << "firstChar: " << firstChar << '\n';
+      //std::cerr << "firstChar: " << firstChar << '\n';
       if(firstChar[0] == '>'){
-         std::cerr << "Yes FASTA\n";
+         _x.reserve(n);
+         //std::cerr << "Yes FASTA\n";
          std::ifstream streamInfileRef(refFileName);
          std::string line, content;
          while(std::getline(streamInfileRef, line).good()){
             if( line.empty() || line[0] == '>' ){
                _x += content;
+               //std::cerr << _x << "size: " << _x.size() << "\n";
                std::string().swap(content);
             }
             else if (!line.empty()) {
                content += line;
             }
          }
-         _x += content;
+         if(content.size()) _x += content;
+         //std::cerr << _x << "size: " << _x.size() << "\n";
          std::string().swap(content);
          _x.resize(_x.size());
          streamInfileRef.close();
       }
       else{
-         std::cerr << "No FASTA\n";
+         //std::cerr << "No FASTA\n";
          fseek(infileRef, 0, SEEK_SET);
+         _x.resize(n);
          if (n != fread(&_x[0], sizeof(data_type), n, infileRef)) {
             fprintf(stderr, "Error reading %u bytes from file %s\n", n, refFileName);
             exit(1);
@@ -304,11 +307,11 @@ void lzInitialize(char *refFileName, char *collFileName) {
       exit(1);
    }
    fclose(infileRef);
-   fprintf(stderr, "Reference (size = %u):\n\t", _x.size());
+   fprintf(stderr, "Reference (size = %lu):\n\t", _x.size());
 
    auto t01 = std::chrono::high_resolution_clock::now();
    //_x = std::string(reinterpret_cast<char const *>(x), n);
-   if((_x[_x.size()-1] == '\n') | (_x[_x.size()-1] == '\r')){
+   if((_x[_x.size()-1] == '\n') | (_x[_x.size()-1] == '\r') | (_x[_x.size()-1] == 0)){
       _x.erase(_x.size()-1);
    }
    if(_x[_x.size()-1] == '$'){
@@ -323,13 +326,60 @@ void lzInitialize(char *refFileName, char *collFileName) {
    fseek(infile, 0L, SEEK_END);
    sn = ftello(infile) / sizeof(data_type);
    std::cerr << "sn: " << sn << '\n';
-   fseek(infile, 0L, SEEK_SET);
-   data_type *sx = new data_type[sn + 1];
-   if(sn != fread(sx, sizeof(data_type), sn, infile)){
-      fprintf(stderr, "Error reading %lu bytes from file %s\n", sn, collFileName);
+   fseek(infile, 0, SEEK_SET);
+   std::string sx;
+   if(sn){
+      char *firstChar = new char[1];
+      int o = fread(firstChar, sizeof(char), 1, infile);
+      //std::cerr << "firstChar: " << firstChar << '\n';
+      if(firstChar[0] == '>'){
+         sx.reserve(sn);
+         std::cerr << "Yes FASTA\n";
+         std::ifstream streamInfile(collFileName);
+         std::string line, content;
+         while(std::getline(streamInfile, line).good()){
+            if( line.empty() || line[0] == '>' ){
+               sx += content;
+               sx += "%";
+               //std::cerr << _x << "size: " << _x.size() << "\n";
+               std::string().swap(content);
+            }
+            else if (!line.empty()) {
+               content += line;
+            }
+         }
+         if(content.size()){
+            sx += content;
+            sx += "%";
+         }
+         //std::cerr << _x << "size: " << _x.size() << "\n";
+         std::string().swap(content);
+         sx.resize(sx.size());
+         sn = sx.size();
+         streamInfile.close();
+      }
+      else{
+         std::cerr << "No FASTA\n";
+         fseek(infile, 0, SEEK_SET);
+         sx.resize(sn);
+         if (sn != fread(&sx[0], sizeof(data_type), sn, infile)) {
+            fprintf(stderr, "Error reading %u bytes from file %s\n", n, collFileName);
+            exit(1);
+         }
+      }
+   }
+   else{
+      std::cerr << "Collection file is empty!\n";
       exit(1);
    }
-   sx[sn] = 1; //I don't think there is any reason to do this
+
+   // fseek(infile, 0L, SEEK_SET);
+   // data_type *sx = new data_type[sn + 1];
+   // if(sn != fread(sx, sizeof(data_type), sn, infile)){
+   //    fprintf(stderr, "Error reading %lu bytes from file %s\n", sn, collFileName);
+   //    exit(1);
+   // }
+   // sx[sn] = 1; //I don't think there is any reason to do this
    fclose(infile);
 
    uint64_t *maxRunsReference = new uint64_t[sizeChars]();
@@ -378,7 +428,7 @@ void lzInitialize(char *refFileName, char *collFileName) {
       }
    }
    _x += '$';
-   _x += '\n';
+   _x += (char)0;
    //docBoundaries.reserve(maxRunsCollection['%']);
    headBoundaries.reserve(maxRunsCollection['%']);
    //std::cerr << refAug << "\n";
@@ -391,9 +441,11 @@ void lzInitialize(char *refFileName, char *collFileName) {
    t02 = std::chrono::high_resolution_clock::now();
    std::cerr << "Computing SA done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t02 - t01).count() << " ms\n";
 
-   _sx = sx;
+   //std::cerr << sx << "\n";
+   //_sx = reinterpret_cast<unsigned char*>(const_cast<char*>(sx.c_str()));
+   const std::string _sx{sx};
    _sn = sn - 1;
-   std::cerr << "Last pos " << _sx + _sn - 1 << "\n";
+   std::cerr << "Last pos " << _sx[_sn - 1] << "\n";
    _n = _x.size();
 
    t01 = std::chrono::high_resolution_clock::now();
@@ -427,10 +479,10 @@ void lzInitialize(char *refFileName, char *collFileName) {
    std::cerr << "Preprocessing done in " << preprocTime << " ms\n";
    //sprintf(collFileName, "%s.gsa", collFileName);
    //outputFile = std::string(collFileName);
-
+   return _sx;
 }
 
-int lzFactorize() {
+int lzFactorize(const std::string _sx, std::vector<std::pair<uint32_t, int32_t>> MSGSA) {
 //int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v) {
    verbose = 0;
    //omp_set_num_threads(4);
@@ -459,9 +511,6 @@ int lzFactorize() {
    uint32_t *bucketLengthStarChar = new uint32_t[sizeChars]();
    uint32_t *bucketLengthsHeads = new uint32_t[_n]();
    //uint32_t *bucketLengthsHeads = new uint32_t[sizeChars]();
-   if(verbose) for(size_t s = 0; s < _n; s++){
-      std::cerr << s << "\t" << _SA[s] << "\t" << _x[_SA[s]];
-   }
 
    uint64_t nStar = 0;
    headBoundaries.push_back(0);
@@ -472,6 +521,8 @@ int lzFactorize() {
    uint64_t sumLen = 0, maxLen = 0;
    //uint64_t heurYes = 0, heurNo = 0;
    while(i < _sn){
+      //std::cerr << "i: " << i << "\n";
+      //std::cerr << _sx[i] << "\n";
       if(verbose) std::cerr << "i: " << i << "\n";
       if(i > mark){
          fprintf(stderr,"i = %lu; lpfRuns = %ld\n",i,phrases.size());
@@ -481,6 +532,7 @@ int lzFactorize() {
       if(len > maxLen) maxLen = len;
       charBkts[_sx[i]]++;
       if(_sx[i] == '%'){ //new doc found
+         //std::cerr << "NEWDOC\n";
          leftB = 0;
          rightB = _n-1;
          len = 0;
@@ -492,7 +544,7 @@ int lzFactorize() {
          ndoc++;
       }
       else{
-         computeLZFactorAt(i, &pos, &len, leftB, rightB, match, isSmallerThanMatch, mismatchingSymbol);
+         computeLZFactorAt(_sx, i, &pos, &len, leftB, rightB, match, isSmallerThanMatch, mismatchingSymbol);
          if((int64_t)pos != prevPos+1){
             phrases.push_back(Match(iCurrentDoc, pos, len, isSmallerThanMatch));
          }
@@ -744,7 +796,7 @@ int lzFactorize() {
    std::cerr << "Time to bucket suffixes: " << bucketingTime << " milliseconds\n";
 
    //put $ instead of X, otherwise the X characters does not lead to a correct comparison (because they are greater)
-   for(size_t i = 0; i < _sn; i++) {if(_sx[i] == '%') _sx[i] = '$';}
+   //for(size_t i = 0; i < _sn; i++) {if(_sx[i] == '%') _sx[i] = "$";}
 
    t1 = std::chrono::high_resolution_clock::now();
    //Sort suffixes corrisponding to heads
@@ -933,7 +985,7 @@ int lzFactorize() {
    //std::cerr << "number of diffHeads " << diffSufHeads << "\n";
 
    if(verbose){
-      uint64_t errSStar = checkGSA(sStar, nStar);
+      uint64_t errSStar = checkGSA(sStar, nStar, _sx);
       std::cerr << "N. errors on sStar: " << errSStar << "\n";
    }
 
@@ -1033,8 +1085,8 @@ int lzFactorize() {
       for(size_t i = 0; i < _sn; i++){
          if(verbose) std::cerr << "i=" << i << ": " << MSGSA[i].first << " " << MSGSA[i].second << " " << "\n";//MSGSA[i].head <<"\n";
          
-         data_type *_slice_sx = _sx + MSGSA[i].first + docBoundaries[MSGSA[i].second - 1];
-         data_type *_slice_prev;
+         //data_type *_slice_sx = &_sx[MSGSA[i].first + docBoundaries[MSGSA[i].second - 1]];
+         //data_type *_slice_prev;
          uint32_t maxIdx;
          if(i > 0){
             if(MSGSA[i].second == 0 || MSGSA[i-1].second == 0){
@@ -1042,17 +1094,18 @@ int lzFactorize() {
                err++;
                continue;
             }
-            _slice_prev = _sx + MSGSA[i-1].first + docBoundaries[MSGSA[i-1].second - 1];
+            //_slice_prev = &_sx[MSGSA[i-1].first + docBoundaries[MSGSA[i-1].second - 1]];
             maxIdx = std::min(docBoundaries[MSGSA[i].second] - (MSGSA[i].first + docBoundaries[MSGSA[i].second - 1]), docBoundaries[MSGSA[i-1].second] - (MSGSA[i-1].first + docBoundaries[MSGSA[i-1].second - 1]));
          } 
          else{
-            _slice_prev = (data_type *)"$";
+            //_slice_prev = (data_type *)"$";
             maxIdx = 1;
+            continue;
          }
-         if(verbose) std::cerr << "suf_i-1 " << _slice_prev;
-         if(verbose) std::cerr << "suf_i " << _slice_sx << "\n";
+         //if(verbose) std::cerr << "suf_i-1 " << _slice_prev;
+         //if(verbose) std::cerr << "suf_i " << _slice_sx << "\n";
          
-         if(memcmp(_slice_sx, _slice_prev, maxIdx) < 0){
+         if(memcmp(&_sx[MSGSA[i].first + docBoundaries[MSGSA[i].second - 1]], &_sx[MSGSA[i-1].first + docBoundaries[MSGSA[i-1].second - 1]], maxIdx) < 0){
             if(verbose) std::cerr << "PROBLEM with " << i-1 << " (" << MSGSA[i-1].first << "," << MSGSA[i-1].second << ") and " << i << " (" << MSGSA[i].first << "," << MSGSA[i].second << ")\n"; 
             err++;
             //if(err) break;
@@ -1068,18 +1121,18 @@ int lzFactorize() {
    // delete[] _LCP;
    // delete[] _ISA;
    // delete[] _SA;
-   // std::vector<Suf>().swap(MSGSA);
+   //std::vector<std::pair<uint32_t, int32_t>>().swap(MSGSA);
 
-    return numfactors;
+   return numfactors;
 }
 
-std::vector<std::pair<uint32_t, int32_t>> computeGSA(char* refFileName, char* collFileName){
-   lzInitialize(refFileName, collFileName);
-   lzFactorize();
-   return MSGSA;
+void computeGSA(char* refFileName, char* collFileName, std::vector<std::pair<uint32_t, int32_t>> MSGSA){
+   const std::string _sx = lzInitialize(refFileName, collFileName);
+   lzFactorize(_sx, MSGSA);
+   //return MSGSA;
 }
 
-void computeLZFactorAt(filelength_type i, filelength_type *pos, filelength_type *len, int64_t & leftB, int64_t & rightB, int64_t & maxMatch, bool & isSmallerThanMaxMatch, unsigned char &mismatchingSymbol) {
+void computeLZFactorAt(const std::string &_sx, filelength_type i, filelength_type *pos, filelength_type *len, int64_t & leftB, int64_t & rightB, int64_t & maxMatch, bool & isSmallerThanMaxMatch, unsigned char &mismatchingSymbol) {
     filelength_type offset = *len;
     filelength_type j = i + offset;
 
