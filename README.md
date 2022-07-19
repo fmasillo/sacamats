@@ -24,6 +24,11 @@ List of files example:
 /data/reference.fa
 /data/collection.fa
 ```
+If the user wants to save the Generalized Suffix Array to (binary) file, he can specify the output file via adding the ```-o``` flag to the usual command, e.g.:
+
+```sh
+./sacamats list_of_files.txt -o outputGSA
+```
 
 ## Citation
 
