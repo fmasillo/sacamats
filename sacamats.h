@@ -17,6 +17,6 @@ const std::string lzInitialize(char *refFileName, char *collFileName);
 int lzFactorize(const std::string _sx);
 //int lzFactorize(char *fileToParse, int seqno, char* outputfilename, bool verbose);
 
-void computeGSA(char *refFileName, char *filename, std::vector<std::pair<uint32_t, int32_t>> MSGSA);
+void computeGSA(char *refFileName, char *filename, std::vector<std::pair<uint32_t, int32_t>> &MSGSA);
 
 #endif

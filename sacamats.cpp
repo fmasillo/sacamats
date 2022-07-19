@@ -487,7 +487,7 @@ const std::string lzInitialize(char *refFileName, char *collFileName) {
    return _sx;
 }
 
-int lzFactorize(const std::string _sx, std::vector<std::pair<uint32_t, int32_t>> MSGSA) {
+int lzFactorize(const std::string _sx, std::vector<std::pair<uint32_t, int32_t>> &MSGSA) {
 //int lzFactorize(char *fileToParse, int seqno, char* outputfilename, const bool v) {
    verbose = 0;
    //omp_set_num_threads(4);
@@ -1131,7 +1131,7 @@ int lzFactorize(const std::string _sx, std::vector<std::pair<uint32_t, int32_t>>
    return numfactors;
 }
 
-void computeGSA(char* refFileName, char* collFileName, std::vector<std::pair<uint32_t, int32_t>> MSGSA){
+void computeGSA(char* refFileName, char* collFileName, std::vector<std::pair<uint32_t, int32_t>> &MSGSA){
    const std::string _sx = lzInitialize(refFileName, collFileName);
    lzFactorize(_sx, MSGSA);
    //return MSGSA;

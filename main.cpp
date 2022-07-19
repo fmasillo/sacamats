@@ -9,14 +9,20 @@
 #include "utils.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 
 int main(int argc, char **argv) {
-    if (argc > 2) {
+    //std::cerr << argc << '\n';
+    if (argc != 2 && argc != 4) {
         //fprintf(stderr, "usage: %s {file of filenames} {isMismatchingSymbolNeeded (1 - yes, 0 - no)} {output file} {verbose}\n", argv[0]);
-        fprintf(stderr, "usage: %s {file of filenames}\n", argv[0]);
+        fprintf(stderr, "usage: %s {file of filenames}\n or %s {file of filenames} -o {output.txt}\n or ", argv[0], argv[0]);
         exit(1);
     }
-
+    if(argc == 4 && strcmp(argv[2], "-o")){
+        std::cout << argv[2] << '\n';
+        std::cout << "The only flag that can be added is -o for outputting the GSA.\n";
+        exit(1);
+    }
     // double totalCollectionSize = 0;
 //    double ttotal = getTime();
 
@@ -97,6 +103,13 @@ int main(int argc, char **argv) {
     //lzFactorize(filename, 0, argv[3], verbose);
     std::vector<std::pair<uint32_t, int32_t>> MSGSA;
     computeGSA(refFileName, filename, MSGSA);
+    if(argc == 4){
+        std::cout << "Saving to file\n";
+        //std::cerr << MSGSA.size() << '\n';
+        std::ofstream ofp(argv[3], std::ios_base::binary);
+        ofp.write(reinterpret_cast<const char*>(&MSGSA[0]), sizeof(std::pair<uint32_t, int32_t>)*MSGSA.size());
+        ofp.close();
+    }
     //lzInitialize(x, n, refFileName, filename);
     //lzFactorize(filename, 0);
 
