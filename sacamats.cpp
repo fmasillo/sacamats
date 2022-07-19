@@ -444,7 +444,12 @@ const std::string lzInitialize(char *refFileName, char *collFileName) {
    //std::cerr << sx << "\n";
    //_sx = reinterpret_cast<unsigned char*>(const_cast<char*>(sx.c_str()));
    const std::string _sx{sx};
-   _sn = sn - 1;
+   if(_sx[sn-1] != '%'){
+      _sn = sn - 1;
+   }
+   else{
+      _sn = sn;
+   }
    std::cerr << "Last pos " << _sx[_sn - 1] << "\n";
    _n = _x.size();
 
