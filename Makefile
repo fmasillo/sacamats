@@ -18,6 +18,6 @@ sacamats: $(OBJS)
 	$(CC) $(CFLAGS) -o sacamats $(OBJS) $(LIBS)
 
 clean:
-	/bin/rm -f *.o libsais/src/*.o
+	/bin/rm -f *.o libsais/src/*.o sacamats
 	
 #sacamats *.o

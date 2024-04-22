@@ -32,16 +32,42 @@ If the user wants to save the Generalized Suffix Array to (binary) file, he can 
 
 ## Citation
 
-Please, if you use this tool in an academic setting cite the following paper (to appear in WABI2022):
+Journal paper:
+
+Zsuzsanna Lipták, Francesco Masillo, Simon J. Puglisi. Suffix Sorting via Matching Statistics. Algorithms Mol. Biol. 2024: https://almob.biomedcentral.com/articles/10.1186/s13015-023-00245-z
 
 ```
-  @inproceedings{LiptakMP2022,
-    author    = {Zsuzsanna Lipták and Francesco Masillo and Simon J. Puglisi},
-    title     = {Suffix sorting via matching statistics},
-    booktitle = {22nd International Workshop on Algorithms in Bioinformatics, {WABI}
-                 2022, September 5-7, 2022, Potsdam, Germany},
-    year      = {2022},
-  }
+@article{LiptakMP24,
+  author       = {{\relax Zs}uzsanna Lipt{\'{a}}k and
+                  Francesco Masillo and
+                  Simon J. Puglisi},
+  title        = {Suffix sorting via matching statistics},
+  journal      = {Algorithms Mol. Biol.},
+  volume       = {19},
+  number       = {1},
+  pages        = {11},
+  year         = {2024},
+}
+```
+
+Conference paper:
+
+Zsuzsanna Lipták, Francesco Masillo, Simon J. Puglisi. Suffix Sorting via Matching Statistics. WABI 2022: https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.WABI.2022.20
+
+```
+  @inproceedings{LiptakMP22,
+  author       = {{\relax Zs}uzsanna Lipt{\'{a}}k and
+                  Francesco Masillo and
+                  Simon J. Puglisi},
+  title        = {Suffix Sorting via Matching Statistics},
+  booktitle    = {22nd International Workshop on Algorithms in Bioinformatics, {WABI}
+                  2022, September 5-7, 2022, Potsdam, Germany},
+  series       = {LIPIcs},
+  volume       = {242},
+  pages        = {20:1--20:15},
+  publisher    = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
+  year         = {2022},
+}
 ```
 
 
