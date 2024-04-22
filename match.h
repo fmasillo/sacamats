@@ -16,6 +16,7 @@ struct Match{
    //}
    Match(uint32_t s, uint32_t p, uint32_t l) : start(s), pos(p), len(l), smaller(false) { }
    Match(uint32_t s, uint32_t p, uint32_t l, bool sm) : start(s), pos(p), len(l), smaller(sm) { }
+   Match(uint32_t s, uint32_t p, uint32_t l, bool sm, unsigned char n) : start(s), pos(p), len(l), smaller(sm), next(n) { }
    void changeS(uint32_t s){
       start = s;
    }
@@ -32,6 +33,7 @@ struct Match{
    uint32_t len; //length of match
    //data_type next; //symbol in the collection after the match
    bool smaller;
+   unsigned char next;
 };
 
 struct MatchSA
@@ -51,7 +53,7 @@ struct MatchSA
 
 
 struct SufSStar{
-   SufSStar() : head(0),  idx(0), doc(0) { diffLen.val = 0; }
+   SufSStar() : head(0), idx(0), doc(0) { diffLen.val = 0; }
    SufSStar(uint32_t i, uint32_t d) : head(0), idx(i), doc(d) { diffLen.val = 0; }
    SufSStar(uint32_t i, uint32_t d, uint32_t h) : head(h), idx(i), doc(d) { diffLen.val = 0; }
    SufSStar(uint32_t i, uint32_t d, uint32_t h, uint32_t dL) : head(h), idx(i), doc(d) { diffLen.val = dL; }
@@ -64,8 +66,8 @@ struct SufSStar{
       head = h, diffLen.val = dL, idx = i, doc = d;
    }
    uint32_t head;
-   Key diffLen;
    uint32_t idx;
+   Key diffLen;
    uint32_t doc;
    
 };

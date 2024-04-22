@@ -2,9 +2,10 @@ VERSION = 1.0
 SHELL = /bin/sh
 
 CC = g++
-CFLAGS = -std=c++17 -O3 -funroll-loops -fopenmp
+CFLAGS = -std=c++20 -O3 -funroll-loops -fopenmp -march=native -DNDEBUG
 #CFLAGS = -std=c++11 -g -Wall -Wextra -pedantic -funroll-loops -DNDEBUG
-OBJS = gsa-is/gsacak.o sais-lite-2.4.1/sais.o utils.o sacamats.o main.o 
+OBJS = utils.o induce_parallel.o libsais/src/libsais.o sacamats.o main.o #malloc_count/malloc_count.o
+LIBS = -ltbb
 
 EXEC = clean sacamats
 
@@ -17,4 +18,6 @@ sacamats: $(OBJS)
 	$(CC) $(CFLAGS) -o sacamats $(OBJS) $(LIBS)
 
 clean:
-	/bin/rm -f sacamats *.o gsa-is/*.o sais-lite-2.4.1/*.o
+	/bin/rm -f *.o libsais/src/*.o
+	
+#sacamats *.o

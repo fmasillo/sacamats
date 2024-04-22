@@ -10,29 +10,83 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <getopt.h>
+
+// function that prints the instructions for using the tool
+void print_help(char** argv) {
+  std::cout << "Usage: " << argv[ 0 ] << " [options] <input filename>" << std::endl;
+  std::cout << "<input filename> is the name of the file containing paths to the reference sequence (in the first line) and to the collection file (in the second line)." << std::endl;
+  std::cout << "  Options: " << std::endl
+        << "\t-p \tread only a prefix of the file expressed in number of characters, def. whole file" << std::endl
+        << "\t-t \tnumber of threads to use, def. max available" << std::endl
+        << "\t-o \tbasename for the output files, def. <input filename>" << std::endl
+        << "\t-h \tprints this help" << std::endl;
+  exit(-1);
+}
+
+// function for parsing the input arguments
+void parseArgs( int argc, char** argv, Args& arg ) {
+    int c;
+    extern int optind;
+
+    puts("==== Command line:");
+    for(int i=0;i<argc;i++)
+        printf(" %s",argv[i]);
+    puts("");
+
+    std::string sarg;
+    while ((c = getopt( argc, argv, "p:t:o:h") ) != -1) {
+        switch(c) {
+            case 'p':
+                sarg.assign(optarg);
+                arg.prefixLength = atoll(sarg.c_str()); break;
+                // store the prefix length
+            case 't':
+                sarg.assign(optarg);
+                arg.nThreads = atoll(sarg.c_str()); break;
+                // store the number of threads
+            case 'o':
+                sarg.assign(optarg);
+                arg.outname.assign(sarg); break;
+                // store the output files path
+            case 'h':
+                print_help(argv); exit(-1);
+                // fall through
+            default:
+                std::cout << "Unknown option. Use -h for help." << std::endl;
+                exit(-1); 
+        }
+    }
+
+    // the only input parameter is the file name
+    if (argc == optind+1) {
+        arg.filename.assign( argv[optind] );
+    }
+    else {
+        std::cout << "Invalid number of arguments" << std::endl;
+        print_help(argv);
+    }
+    // set output files basename
+    if(arg.outname == "") arg.outname = arg.filename + ".gsa";
+
+    std::cout << "==== Parameters:" << std::endl;
+    std::cout << "Input file: " << arg.filename << std::endl;
+    std::cout << "Output basename: " << arg.outname << std::endl;
+    std::cout << "Prefix length: " << arg.prefixLength << std::endl;
+    std::cout << "Number of threads: " << arg.nThreads << std::endl;
+    std::cout << std::endl;
+
+}
 
 int main(int argc, char **argv) {
-    //std::cerr << argc << '\n';
-    if (argc != 2 && argc != 4) {
-        //fprintf(stderr, "usage: %s {file of filenames} {isMismatchingSymbolNeeded (1 - yes, 0 - no)} {output file} {verbose}\n", argv[0]);
-        fprintf(stderr, "usage: %s {file of filenames}\n or %s {file of filenames} -o {output.txt}\n or ", argv[0], argv[0]);
-        exit(1);
-    }
-    if(argc == 4 && strcmp(argv[2], "-o")){
-        std::cout << argv[2] << '\n';
-        std::cout << "The only flag that can be added is -o for outputting the GSA.\n";
-        exit(1);
-    }
-    // double totalCollectionSize = 0;
-//    double ttotal = getTime();
+    
+    // parse the input arguments
+    Args arg;
+    parseArgs(argc, argv, arg);
 
-//    char output_opt = argv[3][0];
-    //std::cerr << argv[4] << "\n";
-    //bool verbose = argv[4][0] == '1';
-    //std::cerr << "verbose = " << verbose << "\n";
-    FILE *infilesfile = fopen(argv[1], "r");
+    FILE *infilesfile = fopen(arg.filename.c_str(), "r");
     if (!infilesfile) {
-        fprintf(stderr, "Error opening file of filenames %s\n", argv[1]);
+        fprintf(stderr, "Error opening file of filenames %s\n", arg.filename.c_str());
         exit(1);
     }
 
@@ -45,102 +99,20 @@ int main(int argc, char **argv) {
     filename[strlen(filename) - 1] = 0;
     char *refFileName = new char[1024];
     strcpy(refFileName, filename);
-
-    //fprintf(stderr, "About to read SA of ref\n");
-    //read the suffix array
-    // char safilename[256];
-    // sprintf(safilename, "%s.sa", filename);
-    // std::cerr << safilename << '\n';
-    // infile = fopen(safilename, "r");
-    // if (!infile) {
-    //     fprintf(stderr, "Error opening suffix array of input file %s\n", safilename);
-    //     exit(1);
-    // }
-    // unsigned int san = 0;
-    // fseek(infile, 0, SEEK_END);
-    // san = ftell(infile) / sizeof(unsigned int);
-    // std::cerr << "san = " << san << '\n';
-    // fseek(infile, 0, SEEK_SET);
-    // unsigned int *sa = new unsigned int[san];
-    // if (san != fread(sa, sizeof(unsigned int), san, infile)) {
-    //     fprintf(stderr, "Error reading sa from file\n");
-    //     exit(1);
-    // }
-    // fclose(infile);
-
-    //std::cerr << "Checking SA\n";
-    //uint64_t lcpsum = 0;
-    //for(uint32_t i = 1; i < san; i++){
-    //   if((i%10000000) == 0) std::cerr << "Checked: " << i << '\n';
-    //   uint32_t s1 = sa[i-1];
-    //   uint32_t s2 = sa[i];
-    //   //std::cerr << s1 << " " << s2 << '\n'; 
-    //   for(uint32_t j=0;j<n;j++){
-    //      //std::cerr << x[s1+j] << " " << x[s2+j] << '\n'; 
-    //      if(x[s1+j] != x[s2+j]){
-    //         if(x[s1+j] > x[s2+j]){
-    //            std::cerr << "Suffixes out of order: " << i << '\n';
-    //            exit(1);
-    //         }
-    //         lcpsum+=j;
-    //         break;
-    //      }
-    //   }
-    //}
-    //std::cerr << "Avg. LCP: " << lcpsum/n << "\n";
-
-    //fprintf(stderr, "Reference (size = %u):\n\t", n);
-    //for (int bi = 0; bi < n; bi++) {
-    //    fprintf(stderr, "%u, ", x[bi]);
-    //}
     fprintf(stderr, "\n");
 
     //compute relative LZ factorization
     char * _ = fgets(filename, 1024, infilesfile);
     filename[strlen(filename) - 1] = '\0';
     
-    //lzInitialize(x, n, std::stoul(argv[2]), refFileName, filename);
-    //lzFactorize(filename, 0, argv[3], verbose);
     std::vector<std::pair<uint32_t, int32_t>> MSGSA;
-    computeGSA(refFileName, filename, MSGSA);
-    if(argc == 4){
-        std::cout << "Saving to file\n";
-        //std::cerr << MSGSA.size() << '\n';
-        std::ofstream ofp(argv[3], std::ios_base::binary);
-        ofp.write(reinterpret_cast<const char*>(&MSGSA[0]), sizeof(std::pair<uint32_t, int32_t>)*MSGSA.size());
-        ofp.close();
-    }
-    //lzInitialize(x, n, refFileName, filename);
-    //lzFactorize(filename, 0);
-
-//     int seqno = 1;
-//     unsigned int totalNumFactors = 0;
-// //    double totalBitsOut = 0;
-//     while (fgets(filename, 1024, infilesfile)) {
-//         filename[strlen(filename) - 1] = '\0';
-//         fprintf(stderr, "Reading sequence %d (%s)\n", seqno, filename);
-        
-//         fprintf(stderr, "---Factorizing sequence %d\n", seqno);
-//         double tlz = getTime();
-//         totalNumFactors += lzFactorize(filename, seqno, argv[3], verbose);
-//         fprintf(stderr, "---Time to lz factorize sequence %d = %.2f secs\n", seqno, getTime() - tlz);
-//         fprintf(stdout, "%.2f,%d,%u,", getTime() - tlz, totalNumFactors, n);
-// //        totalBitsOut += bits_out;
-//         seqno++;
-        
-//     }
-//    fprintf(stderr, "----Collection parsed into %u factors.\n", totalNumFactors);
-//    fprintf(stderr, "----Total time: %.2f secs.\n", getTime() - ttotal);
-//    fprintf(stderr, "----Estimated encoded size (minus ref): %.2f megabytes.\n",
-//            (totalNumFactors * (ceil(log(n) / log(2))) +
-//             totalNumFactors * ceil(log(totalCollectionSize / totalNumFactors) / log(2))) / 8 / (1 << 20));
-//    fprintf(stderr, "----Estimated encoded size (incl. ref): %.2f megabytes.\n",
-//            (2 * n + totalNumFactors * (ceil(log(n) / log(2))) +
-//             totalNumFactors * ceil(log(totalCollectionSize / totalNumFactors) / log(2))) / 8 / (1 << 20));
-//    fprintf(stderr, "----Size using Elias Delta (minus ref): %.2f megabytes.\n", (totalBitsOut) / 8 / (1 << 20));
-//    fprintf(stderr, "----Size using Elias Delta (incl. ref): %.2f megabytes.\n",
-//            (2 * n + totalBitsOut) / 8 / (1 << 20));
-    exit(0);
+    computeGSA(refFileName, filename, arg.prefixLength, arg.nThreads, MSGSA);
+    
+    std::cout << "Saving to file\n";
+    //std::cerr << MSGSA.size() << '\n';
+    std::ofstream ofp(arg.outname.c_str(), std::ios_base::binary);
+    ofp.write(reinterpret_cast<const char*>(&MSGSA[0]), sizeof(std::pair<uint32_t, int32_t>)*MSGSA.size());
+    ofp.close();
 
     free(filename);
     //delete[] x;
