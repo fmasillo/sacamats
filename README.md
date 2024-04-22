@@ -12,7 +12,21 @@ make
 
 ## Usage
 
-This tool expects only one argument from command line, namely a txt file consisting of two rows. The first row should be the path to the reference sequence file and the sequence must be terminated with a dollar sign. The second row should be the path to the collection of sequences, either in FASTA format or all in one line separated by %.
+This tool expects only one argument from command line, namely a txt file consisting of two rows. The first row should be the path to the reference sequence file. The second row should be the path to the collection of sequences in FASTA format.
+
+By calling the executable with ```-h``` a help message is displayed.
+
+```sh
+./sacamats -h
+
+Usage: ./sacamats [options] <input filename>
+<input filename> is the name of the file containing paths to the reference sequence (in the first line) and to the collection file (in the second line).
+  Options: 
+        -p      read only a prefix of the file expressed in number of characters, def. whole file
+        -t      number of threads to use, def. max available
+        -o      basename for the output files, def. <input filename>
+        -h      prints this help
+```
 
 Command example:
 ```sh
@@ -23,11 +37,6 @@ List of files example:
 ```
 /data/reference.fa
 /data/collection.fa
-```
-If the user wants to save the Generalized Suffix Array to (binary) file, he can specify the output file via adding the ```-o``` flag to the usual command, e.g.:
-
-```sh
-./sacamats list_of_files.txt -o outputGSA
 ```
 
 ## Citation
