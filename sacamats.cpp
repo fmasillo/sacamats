@@ -14,7 +14,7 @@
 #ifndef _OPENMP
    #define _OPENMP ; 
 #endif
-#include "libsais/src/libsais.h"
+#include "libsais/include/libsais.h"
 #include "sacamats.h"
 #include "rmq_tree.h"
 #include "utils.h"
