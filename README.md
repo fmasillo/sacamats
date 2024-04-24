@@ -60,7 +60,7 @@ Zsuzsanna Lipták, Francesco Masillo, Simon J. Puglisi. Suffix Sorting via Match
 
 Conference paper:
 
-Zsuzsanna Lipt´ak, Francesco Masillo, and Simon J. Puglisi. Suffix sorting via matching statistics. In Proc. of the 22nd International Workshop on Algorithms in Bioinformatics (WABI 2022), volume 242 of LIPIcs, pages 20:1–20:15. Schloss Dagstuhl - Leibniz-Zentrum f¨ur Informatik, 2022: https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.WABI.2022.20
+Zsuzsanna Lipták, Francesco Masillo, and Simon J. Puglisi. Suffix sorting via matching statistics. In Proc. of the 22nd International Workshop on Algorithms in Bioinformatics (WABI 2022), volume 242 of LIPIcs, pages 20:1–20:15. Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 2022: https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.WABI.2022.20
 
 ```
   @inproceedings{LiptakMP22,
